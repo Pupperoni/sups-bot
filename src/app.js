@@ -19,8 +19,8 @@ class JsonResponse extends Response {
 }
 const router = Router();
 
-router.get('/', (req) => {
-    return new Response(`👋 ${process.env.APP_ID}`);
+router.get('/', (req, env) => {
+    return new Response(`👋 ${env.APP_ID}`);
 });
 
 /**
@@ -80,7 +80,7 @@ router.post('/interactions', async (req, env) => {
                 });
             }
 
-            const job = createScheduledJob(`${year}-${month + 1}-${date} ${hour}:${minute}`,
+            const job = createScheduledJob(`${minute} ${hour} ${eventDate.date()} ${eventDate.month() + 1} *`,
                 async function() {
                     console.log(`I am sending a reminder to ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);
                     const endpoint = `channels/${interaction.channel_id}/messages`;
