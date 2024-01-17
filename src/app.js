@@ -146,7 +146,8 @@ router.post('/interactions', async (req, env) => {
                 });
             }
 
-            const eventDate = dayjs().add(days, 'days').add(hours, 'hours').add(minutes, 'minutes');
+            const eventDate = dayjs().add(days, 'days').add(hours, 'hours').add(minutes, 'minutes').tz(tz);
+            console.log('eventDate', eventDate.format('MM/DD/YYYY hh:mm A'));
             const job = createScheduledJob(`${eventDate.minute()} ${eventDate.hour()} ${eventDate.date()} ${eventDate.month() + 1} *`,
                 async function() {
                     console.log(`I am sending a reminder to ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);
@@ -158,7 +159,7 @@ router.post('/interactions', async (req, env) => {
                         }
                     });
                     job.stop();
-                },  tz
+                }, tz
             );
 
             console.log(`Successfully created a scheduled job for ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);
