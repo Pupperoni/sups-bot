@@ -1,10 +1,16 @@
 import 'dotenv/config';
 import { DiscordRequest, createScheduledJob, enumerateStrings, verifyDiscordRequest } from './utils.js';
 import { COMMAND_NAMES, INTERACTION_TYPE, INTERACTION_RESPONSE_TYPE } from './constants.js';
-import dayjs from 'dayjs';
-
 import { Router } from 'itty-router';
-import EventEmitter from 'node:events';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
+
+// todo: move to env or make configurable
+const tz = 'Asia/Manila';
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault(tz);
 
 class JsonResponse extends Response {
     constructor(body, init) {
@@ -101,7 +107,7 @@ router.post('/interactions', async (req, env) => {
                 return new JsonResponse({
                     type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                     data: {
-                        content: `<@${userId}> has set an event: \`${eventName}\` on \`${eventDate.format('MM/DD/YYYY')}\`. I will remind you at \`${eventDate.format('HH:mm A')}\`.`
+                        content: `<@${userId}> has set an event: \`${eventName}\` on \`${eventDate.format('MM/DD/YYYY')}\`. I will remind you at \`${eventDate.format('hh:mm A')}\`.`
                     }
                 });
             } catch (error) {
@@ -137,15 +143,6 @@ router.post('/interactions', async (req, env) => {
             }
 
             const eventDate = dayjs().add(days, 'days').add(hours, 'hours').add(minutes, 'minutes');
-            const eventEmitter = new EventEmitter();
-
-            eventEmitter.on('message', () => {
-                console.log('i am running');
-            });
-
-            const offset = eventDate.toDate().getTime() - now.toDate().getTime();
-            console.log(`waiting for ${offset}ms`)
-            eventEmitter.emit('message');
             const job = createScheduledJob(`${eventDate.minute()} ${eventDate.hour()} ${eventDate.date()} ${eventDate.month() + 1} *`,
                 async function() {
                     console.log(`I am sending a reminder to ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);

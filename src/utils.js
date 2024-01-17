@@ -1,8 +1,6 @@
 import 'dotenv/config';
 import { verifyKey } from 'discord-interactions';
-import { scheduleJob } from 'node-schedule';
 import { CronJob } from 'cron';
-
 
 export function VerifyDiscordRequestMiddleware(clientKey) {
   return function (req, res, buf, encoding) {
@@ -74,7 +72,7 @@ export function getRandomEmoji() {
 }
 
 export function createScheduledJob(date, task) {
-  return new CronJob(date, task, null, true);
+  return new CronJob(date, task, null, true, 'Asia/Manila');
 }
 
 export function amountAndPluralizedString(amount, string) {
