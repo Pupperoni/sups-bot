@@ -102,8 +102,7 @@ router.post('/interactions', async (req, env) => {
                         }
                     });
                     job.stop();
-                    
-                }
+                }, tz
             );
 
             console.log(`Successfully created a scheduled job for ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);
@@ -159,7 +158,7 @@ router.post('/interactions', async (req, env) => {
                         }
                     });
                     job.stop();
-                }
+                },  tz
             );
 
             console.log(`Successfully created a scheduled job for ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);

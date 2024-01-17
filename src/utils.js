@@ -71,8 +71,8 @@ export function getRandomEmoji() {
   return emojiList[Math.floor(Math.random() * emojiList.length)];
 }
 
-export function createScheduledJob(date, task) {
-  return new CronJob(date, task, null, true);
+export function createScheduledJob(date, task, tz) {
+  return new CronJob(date, task, null, true, tz);
 }
 
 export function amountAndPluralizedString(amount, string) {
