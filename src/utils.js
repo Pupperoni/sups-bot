@@ -72,7 +72,7 @@ export function getRandomEmoji() {
 }
 
 export function createScheduledJob(date, task) {
-  return new CronJob(date, task, null, true, 'Asia/Manila');
+  return new CronJob(date, task, null, true);
 }
 
 export function amountAndPluralizedString(amount, string) {

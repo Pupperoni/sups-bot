@@ -10,7 +10,7 @@ import timezone from 'dayjs/plugin/timezone.js';
 const tz = 'Asia/Manila';
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault(tz);
+// dayjs.tz.setDefault(tz);
 
 class JsonResponse extends Response {
     constructor(body, init) {
@@ -75,8 +75,12 @@ router.post('/interactions', async (req, env) => {
             const hour = +(data.options.find(opt => opt.name === 'hour')?.value) || 0;
             const minute = +(data.options.find(opt => opt.name === 'minute')?.value) || 0;
 
-            const eventDate = dayjs(`${year}-${month + 1}-${date} ${hour}:${minute}`);
-            if (eventDate.isBefore(dayjs())) {
+            const eventDate = dayjs.tz(`${year}-${month + 1}-${date} ${hour}:${minute}`, tz);
+            console.log('eventDate', eventDate.format('MM:DD:YYYY hh:mm A'));
+            console.log('eventDate ISO', eventDate.toISOString());
+            console.log('eventDate.hour()', eventDate.hour());
+            console.log('eventDate.minute()', eventDate.minute());
+            if (eventDate.isBefore(now)) {
                 console.error(`Error: REMINDAT: Created a reminder for the past: ${user.username} ${userId}`, data);
                 return new JsonResponse({
                     type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -86,7 +90,8 @@ router.post('/interactions', async (req, env) => {
                 });
             }
 
-            const job = createScheduledJob(`${minute} ${hour} ${eventDate.date()} ${eventDate.month() + 1} *`,
+            console.log(`cron ${eventDate.minute()} ${eventDate.hour()} ${eventDate.date()} ${eventDate.month() + 1} *`);
+            const job = createScheduledJob(`${eventDate.minute()} ${eventDate.hour()} ${eventDate.date()} ${eventDate.month() + 1} *`,
                 async function() {
                     console.log(`I am sending a reminder to ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);
                     const endpoint = `channels/${interaction.channel_id}/messages`;
