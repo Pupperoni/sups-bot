@@ -1,9 +1,10 @@
 import 'dotenv/config';
-import fetch from 'node-fetch';
 import { verifyKey } from 'discord-interactions';
+import { scheduleJob } from 'node-schedule';
 import { CronJob } from 'cron';
 
-export function VerifyDiscordRequest(clientKey) {
+
+export function VerifyDiscordRequestMiddleware(clientKey) {
   return function (req, res, buf, encoding) {
     const signature = req.get('X-Signature-Ed25519');
     const timestamp = req.get('X-Signature-Timestamp');
@@ -16,12 +17,26 @@ export function VerifyDiscordRequest(clientKey) {
   };
 }
 
+export async function verifyDiscordRequest(request, clientKey) {
+  const signature = request.headers.get('x-signature-ed25519');
+  const timestamp = request.headers.get('x-signature-timestamp');
+  const body = await request.text();
+  const isValidRequest =
+    signature &&
+    timestamp &&
+    verifyKey(body, signature, timestamp, clientKey);
+  if (!isValidRequest) {
+    return { isValid: false };
+  }
+
+  return { interaction: JSON.parse(body), isValid: true };
+}
+
 export async function DiscordRequest(endpoint, options) {
   // append endpoint to root API URL
   const url = 'https://discord.com/api/v10/' + endpoint;
   // Stringify payloads
   if (options.body) options.body = JSON.stringify(options.body);
-  // Use node-fetch to make requests
   const res = await fetch(url, {
     headers: {
       Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
@@ -58,8 +73,8 @@ export function getRandomEmoji() {
   return emojiList[Math.floor(Math.random() * emojiList.length)];
 }
 
-export function createScheduledJob(crontime, onTick, onComplete, autoStart) {
-  return new CronJob(crontime, onTick, onComplete, autoStart);
+export function createScheduledJob(date, task) {
+  return new CronJob(date, task, null, true);
 }
 
 export function amountAndPluralizedString(amount, string) {

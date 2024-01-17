@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
-import { VerifyDiscordRequest, DiscordRequest, createScheduledJob, enumerateStrings } from './utils.js';
-import { COMMAND_NAMES, INTERACTION_TYPE, INTERACTION_RESPONSE_TYPE } from './constants.js';
+import { VerifyDiscordRequest, DiscordRequest, createScheduledJob, enumerateStrings } from '../utils.js';
+import { COMMAND_NAMES, INTERACTION_TYPE, INTERACTION_RESPONSE_TYPE } from '../constants.js';
 import dayjs from 'dayjs';
 
 // Create an express app
