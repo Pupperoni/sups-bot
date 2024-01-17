@@ -1,15 +1,22 @@
 import 'dotenv/config';
 import express from 'express';
-import { VerifyDiscordRequest, DiscordRequest, createScheduledJob, enumerateStrings } from '../utils.js';
+import { VerifyDiscordRequestMiddleware, DiscordRequest, createScheduledJob, enumerateStrings } from '../utils.js';
 import { COMMAND_NAMES, INTERACTION_TYPE, INTERACTION_RESPONSE_TYPE } from '../constants.js';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
+
+// todo: move to env or make configurable
+const tz = 'Asia/Manila';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // Create an express app
 const app = express();
 // Get port, or default to 3000
 const PORT = process.env.PORT || 3000;
 // Parse request body and verifies incoming requests using discord-interactions package
-app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
+app.use(express.json({ verify: VerifyDiscordRequestMiddleware(process.env.PUBLIC_KEY) }));
 
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
@@ -53,8 +60,8 @@ app.post('/interactions', async function (req, res) {
       const hour = +(data.options.find(opt => opt.name === 'hour')?.value) || 0;
       const minute = +(data.options.find(opt => opt.name === 'minute')?.value) || 0;
 
-      const eventDate = dayjs(`${year}-${month + 1}-${date} ${hour}:${minute}`);
-      if (eventDate.isBefore(dayjs())) {
+      const eventDate = dayjs.tz(`${year}-${month + 1}-${date} ${hour}:${minute}`, tz);
+      if (eventDate.isBefore(now)) {
         console.error(`Error: REMINDAT: Created a reminder for the past: ${user.username} ${userId}`, data);
         return res.send({
           type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -75,11 +82,7 @@ app.post('/interactions', async function (req, res) {
             }
           });
           job.stop();
-        },
-        function() {
-          console.log(`I have sent the reminder ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);
-        },
-        false
+        }, tz
       );
 
       job.start();
@@ -89,7 +92,7 @@ app.post('/interactions', async function (req, res) {
         return res.send({
           type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
-            content: `<@${userId}> has set an event: \`${eventName}\` on \`${eventDate.format('MM/DD/YYYY')}\`. I will remind you at \`${eventDate.format('HH:mm A')}\`.`
+            content: `<@${userId}> has set an event: \`${eventName}\` on \`${eventDate.format('MM/DD/YYYY')}\`. I will remind you at \`${eventDate.format('hh:mm A')}\`.`
           }
         });
       } catch (error) {
@@ -123,7 +126,7 @@ app.post('/interactions', async function (req, res) {
         });
       }
 
-      const eventDate = dayjs().add(days, 'days').add(hours, 'hours').add(minutes, 'minutes');
+      const eventDate = dayjs().add(days, 'days').add(hours, 'hours').add(minutes, 'minutes').tz(tz);
       const job = createScheduledJob(`${eventDate.minute()} ${eventDate.hour()} ${eventDate.date()} ${eventDate.month() + 1} *`,
         async function() {
           console.log(`I am sending a reminder to ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);
@@ -131,15 +134,11 @@ app.post('/interactions', async function (req, res) {
           // send a message to discord
           await DiscordRequest(endpoint, { method: 'POST',
             body: {
-              content: `<@${userId}>, here is your reminder for \`${eventName}\` happening at \`${eventDate.format('MM/DD/YYYY HH:mm A')}\`.`
+              content: `<@${userId}>, here is your reminder for \`${eventName}\` happening at \`${eventDate.format('MM/DD/YYYY hh:mm A')}\`.`
             }
           });
           job.stop();
-        },
-        function() {
-          console.log(`I have sent the reminder ${user.username} ${userId} ${eventName} ${eventDate.toISOString()}`);
-        },
-        false
+        }, tz
       );
 
       job.start();
@@ -155,7 +154,7 @@ app.post('/interactions', async function (req, res) {
                 { amount: hours, string: 'hour' },
                 { amount: minutes, string: 'minute' },
               ]
-            )}\`. I will remind you at \`${eventDate.format('MM/DD/YYYY HH:mm A')}\`.`
+            )}\`. I will remind you at \`${eventDate.format('MM/DD/YYYY hh:mm A')}\`.`
           }
         });
       } catch (error) {

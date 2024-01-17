@@ -10,7 +10,6 @@ import timezone from 'dayjs/plugin/timezone.js';
 const tz = 'Asia/Manila';
 dayjs.extend(utc);
 dayjs.extend(timezone);
-// dayjs.tz.setDefault(tz);
 
 class JsonResponse extends Response {
     constructor(body, init) {
