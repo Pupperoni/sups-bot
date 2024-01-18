@@ -9,6 +9,7 @@
     "start": "node src/app.js",
     "register": "node src/register-commands.js",
     "deploy:gcloud": "gcloud app deploy --stop-previous-version",
+    "deploy:cron:gcloud": "gcloud app deploy cron.yaml",
     "browse:gcloud": "gcloud app browse"
   },
   "author": "",

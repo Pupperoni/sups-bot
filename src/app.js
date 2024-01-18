@@ -18,6 +18,11 @@ const PORT = process.env.PORT || 3000;
 // Parse request body and verifies incoming requests using discord-interactions package
 app.use(express.json({ verify: VerifyDiscordRequestMiddleware(process.env.PUBLIC_KEY) }));
 
+app.get('/hi', (req, res) => {
+  console.log('hello');
+  res.send('hello');
+});
+
 app.get('/', (req, res) => {
   res.send(`Hello, World!, ${process.env.APP_ID}`);
 });
@@ -64,7 +69,7 @@ app.post('/interactions', async function (req, res) {
       const hour = +(data.options.find(opt => opt.name === 'hour')?.value) || 0;
       const minute = +(data.options.find(opt => opt.name === 'minute')?.value) || 0;
 
-      const eventDate = dayjs.tz(`${year}-${month + 1}-${date} ${hour}:${minute}`, tz);
+      const eventDate = dayjs(`${year}-${month + 1}-${date} ${hour}:${minute}`).tz(tz);
       if (eventDate.isBefore(now)) {
         console.error(`Error: REMINDAT: Created a reminder for the past: ${user.username} ${userId}`, data);
         return res.send({

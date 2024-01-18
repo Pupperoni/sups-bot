@@ -1,0 +1,7 @@
+cron:
+- description: "keep alive ping"
+  url: /hi
+  schedule: every 10 minutes
+  retry_parameters:
+    min_backoff_seconds: 2.5
+    max_doublings: 5
