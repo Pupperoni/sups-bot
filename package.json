@@ -8,7 +8,7 @@
     "dev": "nodemon src/app.js",
     "start": "node src/app.js",
     "register": "node src/register-commands.js",
-    "deploy:gcloud": "gcloud app deploy",
+    "deploy:gcloud": "gcloud app deploy --stop-previous-version",
     "browse:gcloud": "gcloud app browse"
   },
   "author": "",
