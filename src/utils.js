@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { verifyKey } from 'discord-interactions';
 import { CronJob } from 'cron';
+import fetch from 'node-fetch';
 
 export function VerifyDiscordRequestMiddleware(clientKey) {
   return function (req, res, buf, encoding) {

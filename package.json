@@ -5,21 +5,16 @@
   "type": "module",
   "main": "src/app.js",
   "scripts": {
-    "dev:wrangler": "wrangler dev src/app.js",
-    "dev:express": "nodemon src/express/app.js",
-    "start:wrangler": "node src/app.js",
-    "start:express": "node src/express/app.js",
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js",
     "register": "node src/register-commands.js",
-    "publish": "wrangler deploy",
-    "ngrok:wrangler": "ngrok http 8787",
-    "ngrok:express": "ngrok http 3000"
+    "deploy:gcloud": "gcloud app deploy",
+    "browse:gcloud": "gcloud app browse"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.0.2",
-    "rollup-plugin-node-polyfills": "^0.2.1",
-    "wrangler": "^3.22.5"
+    "nodemon": "^3.0.2"
   },
   "dependencies": {
     "cron": "^3.1.6",
@@ -27,6 +22,6 @@
     "discord-interactions": "^3.4.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "itty-router": "^4.0.27"
+    "node-fetch": "^3.3.2"
   }
 }
