@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { VerifyDiscordRequestMiddleware } from './utils.js';
 import { COMMAND_NAMES, INTERACTION_TYPE, INTERACTION_RESPONSE_TYPE } from './constants.js';
-import RemindCommandHandler from './command-handlers/remind-command-handler.js';
+import RemindCommandHandler from './command-handlers/remind.command-handler.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,29 +24,28 @@ app.get('/', (req, res) => {
 
 app.post('/interactions', async function (req, res) {
     let result = {
-        status: 400,
         type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
         data: { content: `Invalid interaction. Please try again.` }
     };
 
     const interaction = req.body;
-    if (!interaction || !interaction.type || !interaction.member?.user || !interaction.channel_id) {
+    if (!interaction || !interaction.type) {
         console.error('Error: Missing interaction info');
-        return res.status(result.status).send(result);
+        return res.send(result);
     }
-    const { type, member } = interaction;
-    const { user } = member;
+    const { type } = interaction;
 
     if (type === INTERACTION_TYPE.PING) {
-        result = { status: 200, type: INTERACTION_RESPONSE_TYPE.PONG };
+        result = { type: INTERACTION_RESPONSE_TYPE.PONG };
     }
 
     if (type === INTERACTION_TYPE.APPLICATION_COMMAND) {
-        if (!interaction.data || !interaction.data.name) {
-            console.error('Error: Missing data');
-            return res.status(result.status).send(result);
+        if (!interaction.data || !interaction.data.name || !interaction.member?.user || !interaction.channel_id) {
+            console.error('Error: Missing data', interaction);
+            return res.send(result);
         }
 
+        const { user } = interaction.member;
         const { data } = interaction;
         const { name } = data;
         if (!data.options) {
@@ -68,7 +67,7 @@ app.post('/interactions', async function (req, res) {
 
     }
 
-    return res.status(result.status).send(result);
+    return res.send(result);
 });
 
 app.listen(PORT, () => {

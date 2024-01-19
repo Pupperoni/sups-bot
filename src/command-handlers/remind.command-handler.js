@@ -28,18 +28,18 @@ const RemindCommandHandler = {
         if (!eventName) {
             console.error(`Error: REMINDAT: Created a reminder without a name: ${user.username} ${user.id}`, data);
             return {
-                status: 400, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: { content:  `Sorry, <@${user.id}>, but you didn't put a name for the event. Try again.` }
             }
         }
     
         const year = +(data.options.find(opt => opt.name === 'year')?.value);
         const month = +(data.options.find(opt => opt.name === 'month')?.value);
-        const date = +(data.options.find(opt => opt.name === 'day')?.value);
+        const date = +(data.options.find(opt => opt.name === 'date')?.value);
         if (!year || (!month && month !== 0) || !date || isNaN(year) || isNaN(month) || isNaN(date)) {
             console.error(`Error: REMINDAT: Created a reminder without a valid date: ${user.username} ${user.id}`, data);
             return {
-                status: 400, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: { content: `Sorry, <@${user.id}>, but you need to add a date for the reminder. Try again.` }
             };
         }
@@ -53,7 +53,7 @@ const RemindCommandHandler = {
         if (eventDate.isBefore(now)) {
             console.error(`Error: REMINDAT: Created a reminder for the past: ${user.username} ${user.id}`, data);
             return {
-                status: 400, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: { content: `Sorry, <@${user.id}>, but you can't make a reminder for the past. Try again.` }
             };
         }
@@ -70,13 +70,13 @@ const RemindCommandHandler = {
         console.log(`Successfully created a cron job for ${user.username} ${user.id} ${eventName} ${eventDate.toISOString()}`);
         try {
             return {
-                status: 200, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: { content: `<@${user.id}> has set an event: \`${eventName}\` on \`${eventDate.format('MM/DD/YYYY')}\`. I will remind you at \`${eventDate.format('hh:mm A')}\`.` }
             };
         } catch (error) {
             console.error('Error sending message: REMINDAT:', error);
             return {
-                status: 500, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: { content: `Sorry, <@${user.id}>. An error occurred. Please try again later.` }
             };
         }
@@ -94,7 +94,7 @@ const RemindCommandHandler = {
         if (!eventName) {
             console.error(`Error: REMINDIN: Created a reminder without a name: ${user.username} ${user.id}`, data);
             return {
-                status: 400, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: { content: `Sorry, <@${user.id}>, but you didn't put a name for the event. Try again.` }
             };
         }
@@ -105,7 +105,7 @@ const RemindCommandHandler = {
         if (!minutes && !hours && !days) {
             console.error(`Error: REMINDIN: Created a reminder without a time: ${user.username} ${user.id}`, data);
             return {
-                status: 400, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: { content: `Sorry, <@${user.id}>, but you need to add a time for the reminder. Try again.` }
             };
         }
@@ -123,7 +123,7 @@ const RemindCommandHandler = {
         console.log(`Successfully created a cron job for ${user.username} ${user.id} ${eventName} ${eventDate.toISOString()}`);
         try {
             return {
-                status: 200, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: {
                     content: `<@${user.id}> has set an event: \`${eventName}\` in \`${enumerateStrings(
                         [
@@ -137,7 +137,7 @@ const RemindCommandHandler = {
         } catch (error) {
             console.error('Error sending message: REMINDAT:', err);
             return {
-                status: 500, type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
+                type: INTERACTION_RESPONSE_TYPE.CHANNEL_MESSAGE_WITH_SOURCE,
                 data: { content: `Sorry, <@${user.id}>. An error occurred. Please try again later.` }
             };
         }
