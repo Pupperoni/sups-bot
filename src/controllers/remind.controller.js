@@ -9,14 +9,7 @@ const tz = process.env.TZ || 'Asia/Manila';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-/**
- * @typedef User
- * @type {Object}
- * @property {Number} id
- * @property {string} username
- */
-
-const RemindCommandHandler = {
+const RemindController = {
     /**
      * @param {Object} data the interaction data
      * @param {User} user the user that sent the interaction
@@ -144,4 +137,4 @@ const RemindCommandHandler = {
     }
 }
 
-export default RemindCommandHandler;
+export default RemindController;

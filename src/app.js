@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { VerifyDiscordRequestMiddleware } from './utils.js';
 import { COMMAND_NAMES, INTERACTION_TYPE, INTERACTION_RESPONSE_TYPE } from './constants.js';
-import RemindCommandHandler from './command-handlers/remind.command-handler.js';
+import RemindController from './controllers/remind.controller.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,11 +54,11 @@ app.post('/interactions', async function (req, res) {
 
         //#region REMIND COMMANDS
         if (name === COMMAND_NAMES.REMINDAT) {
-            result = RemindCommandHandler.remindAt(data, user, interaction.channel_id);
+            result = RemindController.remindAt(data, user, interaction.channel_id);
         }
 
         if (name === COMMAND_NAMES.REMINDIN) {
-            result = RemindCommandHandler.remindIn(data, user, interaction.channel_id);
+            result = RemindController.remindIn(data, user, interaction.channel_id);
         }
         //#endregion
     }
